@@ -1,18 +1,15 @@
-package com.androdocs.weatherapp;
+package com.androdocs.weatherapp.ui;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.androdocs.httprequest.HttpRequest;
-
+import com.androdocs.weatherapp.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,19 +17,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.androdocs.weatherapp.common.Utils.APP_ID;
+import static com.androdocs.weatherapp.common.Utils.CITY;
+import static com.androdocs.weatherapp.common.Utils.KEY;
+import static com.androdocs.weatherapp.common.Utils.URL;
+
 public class MainActivity extends AppCompatActivity {
 
-    String CITY = "Ha Noi,vn";
-    String API = "ea9c047e5524a3eb5c1d63eda8f924e9";
 
-    TextView addressTxt, updated_atTxt, statusTxt, tempTxt, temp_minTxt, temp_maxTxt, sunriseTxt,
-            sunsetTxt, windTxt, pressureTxt, humidityTxt;
-    TextView btn_choose;
+    private TextView addressTxt, updated_atTxt, statusTxt, tempTxt, temp_minTxt, temp_maxTxt, sunriseTxt,
+            sunsetTxt, windTxt, pressureTxt, humidityTxt, btn_choose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+
+        new weatherTask().execute();
+    }
+
+    private void initView() {
         btn_choose = findViewById(R.id.btn_choose);
         addressTxt = findViewById(R.id.address);
         updated_atTxt = findViewById(R.id.updated_at);
@@ -48,34 +53,10 @@ public class MainActivity extends AppCompatActivity {
         btn_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Choose city");
-                // add a radio button list
-                String[] animals = {"Ha Noi", ""};
-                int checkedItem = 1; // cow
-                builder.setSingleChoiceItems(animals, checkedItem, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // user checked an item
-                    }
-                });
-
-                // add OK and Cancel buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // user clicked OK
-
-                    }
-                });
-                builder.setNegativeButton("Cancel", null);
-
-                // create and show the alert dialog
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                Intent intent = new Intent(MainActivity.this, CityActivity.class);
+                startActivity(intent);
             }
         });
-        new weatherTask().execute();
     }
 
     class weatherTask extends AsyncTask<String, Void, String> {
@@ -90,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         protected String doInBackground(String... args) {
-            String response = HttpRequest.excuteGet("https://api.openweathermap.org/data/2.5/weather?q=" + CITY + "&units=metric&appid=" + API);
+            String response = HttpRequest.excuteGet(URL + CITY + KEY + APP_ID);
             return response;
         }
 
@@ -104,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject sys = jsonObj.getJSONObject("sys");
                 JSONObject wind = jsonObj.getJSONObject("wind");
                 JSONObject weather = jsonObj.getJSONArray("weather").getJSONObject(0);
-
                 Long updatedAt = jsonObj.getLong("dt");
                 String updatedAtText = "Updated at: " + new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.ENGLISH).format(new Date(updatedAt * 1000));
                 String temp = main.getString("temp") + "°C";
@@ -112,15 +92,11 @@ public class MainActivity extends AppCompatActivity {
                 String tempMax = "Max Temp: " + main.getString("temp_max") + "°C";
                 String pressure = main.getString("pressure");
                 String humidity = main.getString("humidity");
-
                 Long sunrise = sys.getLong("sunrise");
                 Long sunset = sys.getLong("sunset");
                 String windSpeed = wind.getString("speed");
                 String weatherDescription = weather.getString("description");
-
                 String address = jsonObj.getString("name") + ", " + sys.getString("country");
-
-
                 /* Populating extracted data into our views */
                 addressTxt.setText(address);
                 updated_atTxt.setText(updatedAtText);
@@ -133,17 +109,15 @@ public class MainActivity extends AppCompatActivity {
                 windTxt.setText(windSpeed);
                 pressureTxt.setText(pressure);
                 humidityTxt.setText(humidity);
-
                 /* Views populated, Hiding the loader, Showing the main design */
                 findViewById(R.id.loader).setVisibility(View.GONE);
                 findViewById(R.id.mainContainer).setVisibility(View.VISIBLE);
-
-
             } catch (JSONException e) {
                 findViewById(R.id.loader).setVisibility(View.GONE);
                 findViewById(R.id.errorText).setVisibility(View.VISIBLE);
             }
 
         }
+
     }
 }
