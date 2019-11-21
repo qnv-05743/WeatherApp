@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_gradient"
     android:orientation="vertical"
     android:padding="25dp">
@@ -11,19 +11,21 @@
         android:id="@+id/search_bar"
         android:layout_width="400dp"
         android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="100dp"
         android:layout_marginRight="10dp"
         android:gravity="center"
         app:mt_hint="City Name"
-        app:mt_speechMode="true"></com.mancj.materialsearchbar.MaterialSearchBar>
+        app:mt_speechMode="false"></com.mancj.materialsearchbar.MaterialSearchBar>
+
 
     <RelativeLayout
         android:id="@+id/mainContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
+
 
         <LinearLayout
             android:id="@+id/addressContainer"
@@ -36,14 +38,14 @@
                 android:id="@+id/address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DHAKA, BD"
+                android:text="Ha noi,VN"
                 android:textSize="24dp" />
 
             <TextView
                 android:id="@+id/updated_at"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="20 April 2012, 20:08 PM"
+                android:text="20 April 2019, 20:08 PM"
                 android:textSize="14dp" />
         </LinearLayout>
 
@@ -70,7 +72,8 @@
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif-thin"
                 android:text="29°C"
-                android:textSize="90dp" />
+                android:textStyle="bold"
+                android:textSize="80dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -85,7 +88,7 @@
                     android:text="Min Temp: 05:05 AM" />
 
                 <Space
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content" />
 
                 <TextView

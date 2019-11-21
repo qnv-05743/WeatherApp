@@ -13,6 +13,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.CityActivity"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/CustomTheme"></activity>
         <activity
             android:name=".ui.MainActivity"

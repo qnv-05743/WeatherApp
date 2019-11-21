@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.androdocs.httprequest.HttpRequest;
 import com.androdocs.weatherapp.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,13 +18,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.androdocs.weatherapp.common.Utils.APP_ID;
-import static com.androdocs.weatherapp.common.Utils.CITY;
-import static com.androdocs.weatherapp.common.Utils.KEY;
-import static com.androdocs.weatherapp.common.Utils.URL;
+import static com.androdocs.weatherapp.common.Common.APP_ID;
+import static com.androdocs.weatherapp.common.Common.CITY;
+import static com.androdocs.weatherapp.common.Common.KEY;
+import static com.androdocs.weatherapp.common.Common.URL;
 
 public class MainActivity extends AppCompatActivity {
-
 
     private TextView addressTxt, updated_atTxt, statusTxt, tempTxt, temp_minTxt, temp_maxTxt, sunriseTxt,
             sunsetTxt, windTxt, pressureTxt, humidityTxt, btn_choose;
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         btn_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CityActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CityActivity.class);
                 startActivity(intent);
             }
         });
