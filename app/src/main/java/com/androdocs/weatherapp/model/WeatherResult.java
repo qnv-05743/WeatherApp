@@ -44,6 +44,9 @@ public class WeatherResult {
     @Expose
     private Integer cod;
 
+    public WeatherResult() {
+    }
+
     public Coord getCoord() {
         return coord;
     }

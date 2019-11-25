@@ -31,17 +31,22 @@ dependencies {
     implementation 'com.github.androdocs:Simple-HTTP-Request:v1.0'
     //////
     implementation 'com.github.mancj:MaterialSearchBar:0.8.2'
+    implementation 'com.google.android.material:material:1.0.0'
+
     implementation 'com.label305:asynctask:1.0.0'
     /////// retrofit
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'com.karumi:dexter:5.0.0'
+
+    /////
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
 
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
 
     //////picasso
     implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
 
 }

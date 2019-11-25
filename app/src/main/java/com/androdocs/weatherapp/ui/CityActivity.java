@@ -1,23 +1,36 @@
 package com.androdocs.weatherapp.ui;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androdocs.httprequest.HttpRequest;
 import com.androdocs.weatherapp.R;
+import com.androdocs.weatherapp.common.Common;
+import com.androdocs.weatherapp.model.WeatherResult;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.jakewharton.picasso.OkHttp3Downloader;
 import com.label305.asynctask.SimpleAsyncTask;
 import com.mancj.materialsearchbar.MaterialSearchBar;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,14 +46,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.Retrofit;
 
 import static com.androdocs.weatherapp.common.Common.APP_ID;
 import static com.androdocs.weatherapp.common.Common.CITY;
+import static com.androdocs.weatherapp.common.Common.IMAGE_FOMAT;
+import static com.androdocs.weatherapp.common.Common.IMAGE_LOAD;
 import static com.androdocs.weatherapp.common.Common.KEY;
 import static com.androdocs.weatherapp.common.Common.URL;
 
@@ -49,6 +70,11 @@ public class CityActivity extends AppCompatActivity {
     private TextView addressTxt, updated_atTxt, statusTxt, tempTxt, temp_minTxt, temp_maxTxt, sunriseTxt,
             sunsetTxt, windTxt, pressureTxt, humidityTxt, errorText;
     private List<String> listCity;
+    ProgressBar loader;
+    private RelativeLayout mainContainer;
+    private ImageView img_status;
+    final Handler mHandler = new Handler();
+    private Thread mUiThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +82,13 @@ public class CityActivity extends AppCompatActivity {
         setContentView(R.layout.activity_city);
         initView();
         new loadCity().execute();
+        search_bar.setEnabled(false);
     }
+
     private void initView() {
+        img_status = (ImageView) findViewById(R.id.img_status);
+        loader = findViewById(R.id.loader);
+        mainContainer = (RelativeLayout) findViewById(R.id.mainContainer);
         search_bar = (MaterialSearchBar) findViewById(R.id.search_bar);
         addressTxt = findViewById(R.id.address);
         addressTxt.setText("");
@@ -83,13 +114,12 @@ public class CityActivity extends AppCompatActivity {
         humidityTxt.setText("");
         errorText = findViewById(R.id.errorText);
         errorText.setText("");
-        search_bar.setEnabled(false);
+
     }
 
     private void api_key(String City) {
-        OkHttpClient client = new OkHttpClient();
-
-        final Request request = new Request.Builder()
+        final OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
                 .url(URL + City + KEY + APP_ID)
                 .get()
                 .build();
@@ -98,11 +128,13 @@ public class CityActivity extends AppCompatActivity {
 
         try {
 
-            Response response = client.newCall(request).execute();
+            final Response response = client.newCall(request).execute();
             client.newCall(request).enqueue(new Callback() {
+
                 @Override
                 public void onFailure(Call call, IOException e) {
                 }
+
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String responseData = response.body().string();
@@ -112,6 +144,8 @@ public class CityActivity extends AppCompatActivity {
                         JSONObject sys = jsonObj.getJSONObject("sys");
                         JSONObject wind = jsonObj.getJSONObject("wind");
                         JSONObject weather = jsonObj.getJSONArray("weather").getJSONObject(0);
+                        String image = weather.getString("icon");
+                        String url = IMAGE_LOAD + image + IMAGE_FOMAT;
                         Long updatedAt = jsonObj.getLong("dt");
                         String updatedAtText = "Updated at: " + new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.ENGLISH).format(new Date(updatedAt * 1000));
                         String temp = main.getString("temp") + "°C";
@@ -137,8 +171,10 @@ public class CityActivity extends AppCompatActivity {
                         setText(windTxt, windSpeed);
                         setText(pressureTxt, pressure);
                         setText(humidityTxt, humidity);
-                        // findViewById(R.id.loader).setVisibility(View.VISIBLE);
-                        findViewById(R.id.mainContainer).setVisibility(View.VISIBLE);
+
+//                        Picasso.with(getApplicationContext())
+//                                .load(url)
+//                                .error(R.drawable.ic_error_outline_white_24dp).into(img_status);
                     } catch (JSONException e) {
 
                     }
@@ -153,6 +189,7 @@ public class CityActivity extends AppCompatActivity {
 
     }
 
+
     private void setText(final TextView text, final String value) {
         runOnUiThread(new Runnable() {
             @Override
@@ -161,6 +198,7 @@ public class CityActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private class loadCity extends SimpleAsyncTask<List<String>> {
         @Override
@@ -179,6 +217,7 @@ public class CityActivity extends AppCompatActivity {
                     builder.append(readed);
                 listCity = new Gson().fromJson(builder.toString(), new TypeToken<List<String>>() {
                 }.getType());
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -215,20 +254,26 @@ public class CityActivity extends AppCompatActivity {
                 @Override
                 public void onSearchStateChanged(boolean enabled) {
                 }
+
                 @Override
                 public void onSearchConfirmed(CharSequence text) {
                     InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getCurrentFocus().getRootView().getWindowToken(), 0);
+
                     api_key(text.toString());
-                    search_bar.setLastSuggestions(listCity);
-                    findViewById(R.id.mainContainer).setVisibility(View.VISIBLE);
+                    search_bar.setLastSuggestions(listCitys);
+                    mainContainer.setVisibility(View.VISIBLE);
+
                 }
+
                 @Override
                 public void onButtonClicked(int buttonCode) {
+
                 }
             });
             search_bar.setLastSuggestions(listCity);
-            findViewById(R.id.mainContainer).setVisibility(View.GONE);
+            // findViewById(R.id.mainContainer).setVisibility(View.GONE);
         }
     }
+
 }
