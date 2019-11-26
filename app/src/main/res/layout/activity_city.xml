@@ -11,21 +11,21 @@
         android:id="@+id/card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
         android:padding="2dp"
         app:cardCornerRadius="40dp"
         app:cardElevation="8dp">
 
         <com.mancj.materialsearchbar.MaterialSearchBar
             android:id="@+id/search_bar"
+            app:mt_borderlessRippleEnabled="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:gravity="center"
             app:mt_hint="City Name"
             app:mt_speechMode="false"></com.mancj.materialsearchbar.MaterialSearchBar>
-
     </androidx.cardview.widget.CardView>
+
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -84,18 +84,9 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="5dp"
                     android:orientation="horizontal"
+                    android:visibility="gone"
                     android:weightSum="5">
 
-                    <TextView
-                        android:id="@+id/temp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="3"
-                        android:fontFamily="sans-serif-thin"
-                        android:text="29°C"
-                        android:textSize="70dp"
-                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/img_status"
@@ -105,6 +96,17 @@
                         android:layout_weight="2"
                         android:src="@drawable/ic_search_black_24dp" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-thin"
+                    android:text="29°C"
+                    android:textSize="70dp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
